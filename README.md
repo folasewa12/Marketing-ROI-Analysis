@@ -116,13 +116,13 @@ Outputs include cleaned datasets, charts, and model summaries.
 
 
 
-├── data/                # Dataset (or sample / description)
+├── ev_20.xlsx     # Dataset 
 
-├── scripts/             # R analysis script
+├── Marketing ROI analysis.R  # R analysis script
 
-├── plots/               # Exported visualisations
+├── Charts         # Exported visualisations
 
-├── report/              # Full PDF report
+├── Marketing ROI analysis.R # Full PDF report
 
-├── README.md            # Project overview and insights
+├── README.md # Project overview and insights
 
