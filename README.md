@@ -58,6 +58,8 @@ ANALYTICAL APPROACH
 
 KEY INSIGHTS
 <img width="2400" height="1500" alt="image" src="https://github.com/user-attachments/assets/9dd9814f-b135-45b9-9f03-2158e3866a09" />
+<img width="2400" height="1500" alt="image" src="https://github.com/user-attachments/assets/75d22644-5a93-4439-acde-1fa82dc7d911" />
+
 
 * Marketing spend and commissions have statistically significant positive effects on purchase value.
 * Revenue differences across campaigns are driven primarily by transaction volume, not transaction size.
