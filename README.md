@@ -1,131 +1,104 @@
-Marketing ROI \& Effectiveness Analysis
-How does marketing spend drive purchase value and profitability?
+# Marketing ROI & Effectiveness Analysis
 
-BUSINESS QUESTION
+**How much does marketing spend really return, and which levers actually move purchase value?**
 
-How does marketing spend influence purchase value and profitability, and which marketing activities deliver the most efficient returns on investment?
+**Author:** Afolasewa Duduyemi · **Tools:** R (dplyr, ggplot2, broom) · **Methods:** KPI design, ANOVA with effect sizes, multiple regression, marginal-return analysis
 
-PROJECT OVERVIEW
+## Business question
 
-Marketing spend is often increased to drive revenue, but higher spend does not always result in higher profitability.
-This project evaluates whether marketing investments effectively drive purchase value and whether they generate efficient returns.
+A business spends on four social channels (Facebook, Instagram, TikTok, Twitter) to sell three
+vehicle types. Leadership wants to know whether that spend is efficient and where the next pound
+of budget should go.
 
-Using transactional marketing data, this analysis examines:
+## Headline findings
 
-* Revenue performance across campaigns, products, and buyer segments
-* Marketing efficiency using Return on Marketing Investment (ROMI)
-* Evidence of diminishing returns as marketing spend increases
-* The goal is to support data-driven marketing budget allocation by balancing revenue growth with efficiency.
+| | Result | What it means |
+|---|---|---|
+| **Average return** | £54.07 of revenue per £1 of spend (portfolio ROMI 53×) | Spend looks extremely profitable on average |
+| **Marginal return** | Each **extra** £1 brings in only **£3.83–£5.00** | The next pound earns about a tenth of the average – budget decisions should use this number |
+| **Channels** | Twitter carries 80% of transactions and 80% of revenue | Its revenue lead is volume; its average sale is only 0.3% higher than Facebook's |
+| **Promotions** | No difference in raw purchase value (p = 0.36); −£22 per sale with controls | No evidence promotions lift sale value |
+| **Product, buyer type, quarter** | Each explains about 3% or less of the variation in purchase value | Not useful levers for budget allocation |
+| **Commissions** | Strongest single predictor (+£3.29 per £1, r = 0.53) | Worth investigating – but commission likely rises *because* sales are bigger |
 
-DATA AND KEY PERFORMANCE INDICATOR (KPI)
+![Average vs marginal return](docs/figures/average_vs_marginal_return.png)
 
-The dataset consists of transactional marketing records, where each observation represents a marketing exposure linked to a purchase outcome.
-Key variables include:
+### 1. Judge budget on marginal return, not average ROMI
+Average ROMI tells you how well past spend did in total; it says nothing about the next pound.
+Regressing purchase value on spend gives **£3.83 of extra revenue per extra £1** (£5.00 once channel,
+product, buyer, promotion and quarter are controlled), and a spend elasticity of **0.07** – a 10%
+rise in spend is associated with a 0.7% rise in purchase value. Spend still pays back at the margin,
+but at roughly one-tenth of the headline rate.
 
-* Purchase value (revenue)
-* Marketing spend
-* Commissions
-* Campaign (Facebook, Instagram, Twitter, TikTok)
-* Product category (SUV, Sedan, Sport)
-* Buyer type (Single, Couple, Family)
-* Promotion status
-* Time (grouped into quarters)
+> **Correction to the original coursework:** the first version reported that ROMI falls as spend
+> rises. That pattern is built into the formula – ROMI = purchase ÷ spend − 1, and purchase value
+> barely varies (SD £181 on £49,198), so ROMI tracks 1 ÷ spend almost exactly (r = 0.98). The
+> marginal-return analysis above is the correct way to test for diminishing returns.
 
-After data cleaning and validation, 44,359 observations were retained from the original ~49,000 records.
+### 2. Twitter's lead is volume, not quality
 
-Key Performance Indicators (KPIs)
+![Campaign volume vs revenue](docs/figures/campaign_volume_vs_revenue.png)
 
-* Purchase Value — primary revenue KPI
-* Return on Marketing Investment (ROMI)
+Campaign explains 10.9% of the variation in purchase value (η² = 0.109), the largest of any
+segment – but in money terms the gaps are small: Twitter sales average £49,227 vs £49,021 on TikTok.
+ROMI ranges only from 52.7 (TikTok) to 53.1 (Twitter).
 
-ROMI = (Purchase − Marketing Spend) / Marketing Spend
+### 3. Effects in context
 
-These KPIs provide a balanced view of value creation and spend efficiency.
+![Segment effects](docs/figures/segment_effects.png)
 
-ANALYTICAL APPROACH
-~ Exploratory Data Analysis (EDA)
+With 44,359 transactions almost any difference is "statistically significant". Every segment effect
+is under 0.3% of an average sale, so none justifies a large budget shift on its own.
 
-* Revenue breakdown by campaign, product, buyer type, and time
-* Distribution analysis of purchase values
-  ~ Relationship analysis
-* Marketing spend vs purchase value
-* Marketing spend vs ROMI
-  ~ Statistical modelling
-* Multiple linear regression
-* ANOVA with post-hoc Tukey tests
+## Recommendations
 
-  * Multivariate predictive modelling with multiple marketing levers
+1. **Report marginal ROMI alongside average ROMI** in budget reviews; set spend where the marginal
+   return still clears the cost of the next campaign.
+2. **Don't move budget to Twitter on this evidence alone** – its efficiency edge is under 1%.
+   Run a controlled test (hold-out regions or time periods) before reallocating.
+3. **Review the promotion programme** – it shows no revenue lift, so its cost needs separate justification.
+4. **Investigate the commission link** with timing data to see whether commission drives sales or
+   simply follows them.
+5. **Collect profit, not just revenue** – product margins and channel-level costs would turn ROMI
+   into a true profitability measure.
 
-KEY INSIGHTS
-<img width="2400" height="1500" alt="image" src="https://github.com/user-attachments/assets/9dd9814f-b135-45b9-9f03-2158e3866a09" />
-<img width="2400" height="1500" alt="image" src="https://github.com/user-attachments/assets/75d22644-5a93-4439-acde-1fa82dc7d911" />
+## Data
 
+- `data/ev_20.xlsx`: 49,287 transactions provided by my MSc lecturer for a coursework assessment.
+  The values appear to be **simulated for teaching**, so findings illustrate method rather than a real company.
+- Fields: purchase value, marketing spend, commissions, campaign, product, buyer type, promotion, period (month), sales rep.
+- Cleaning removed negative commissions, missing categories and invalid codes ("false", "soon", "tank"),
+  and merged "two" into "couple" – **44,359 transactions retained**.
+- Caveat: about 24% of `period` values are exactly 12, which suggests capping; quarterly results should be read cautiously.
 
-* Marketing spend and commissions have statistically significant positive effects on purchase value.
-* Revenue differences across campaigns are driven primarily by transaction volume, not transaction size.
-* Twitter generates both high revenue and the highest ROMI.
-* Higher marketing spend is associated with declining ROMI, indicating diminishing marginal returns.
-* Promotions are associated with lower purchase value after controlling for other factors.
+## Method
 
-RECOMMENDATIONS
+| Step | What | Script |
+|---|---|---|
+| Clean | Validation rules above; transaction-level ROMI | `R/01_clean_data.R` |
+| KPIs & segments | Totals-based ROMI; volume/revenue share; ANOVA with η²; Tukey HSD | `R/02_kpis_and_segments.R` |
+| Return on spend | Spend-only and fully controlled regressions; log-log elasticity; spend deciles | `R/03_return_on_spend.R` |
+| Charts | Figures in `outputs/figures/` | `R/04_charts.R` |
 
-* Prioritise efficiency over pure revenue growth by incorporating ROMI into budget decisions.
-* Reallocate spend toward higher-ROMI campaigns, particularly Twitter.
-* Monitor diminishing returns and avoid uniform budget increases across all campaigns.
-* Use volume-driven campaigns strategically, pairing scale with efficiency checks.
-* Reassess promotional strategies, as promotions may reduce transaction value.
-  These actions can improve profitability without increasing total marketing spend.
+Full model: `purchase ~ marketing + commissions + campaign + promotions + product + buyer + quarter`
+(R² = 0.53, n = 44,359).
 
-STATISTICAL METHODS USED
+## How to run
 
-* Multiple Linear Regression
-* One-way ANOVA
-* Tukey HSD post-hoc testing
-* Predictive regression modelling
+```r
+# from the project folder
+source("run_all.R")   # installs missing packages, writes tables and charts to outputs/
+```
 
-~ All statistical results were validated using significance testing (p < 0.001 where applicable).
+## Repository structure
 
-TOOLS USED
-~ R
-
-* tidyverse
-
-  * ggplot2
-
-    * stats
-
-* Data cleaning \& transformation
-* Regression analysis \& ANOVA
-* Business-focused data storytelling
-
-HOW TO RUN THE CODE
-
-* Clone this repository: git clone https://github.com/folasewa12/marketing-roi-analysis.git
-* Open the project in RStudio.
-* Install required packages: install.packages(c("tidyverse"))
-  ~ Run the scripts in the following order:
-* data\_cleaning.R
-* eda\_visualisations.R
-
-  * statistical\_analysis.R
-
-Outputs include cleaned datasets, charts, and model summaries.
-
-
-
-
-
-📁 Repository Structure
-
-
-
-├── ev_20.xlsx     # Dataset 
-
-├── Marketing ROI analysis.R  # R analysis script
-
-├── Charts         # Exported visualisations
-
-├── Marketing ROI analysis.R # Full PDF report
-
-├── README.md # Project overview and insights
-
+```
+├── run_all.R
+├── R/                      # analysis scripts, run in order
+├── data/ev_20.xlsx         # teaching dataset
+├── docs/
+│   ├── marketing_roi_summary.pdf   # one-page brief
+│   └── figures/
+├── archive/                # original coursework script, report and charts (first version)
+└── outputs/                # generated tables and charts (not tracked)
+```
